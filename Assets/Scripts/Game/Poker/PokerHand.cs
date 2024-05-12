@@ -1,7 +1,6 @@
 using CardGames.Cards;
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,9 +12,11 @@ namespace CardGames.Games.Poker
         int handScore;
         int[] cardValues;
 
+        const int MAX_SUITS = 4;
+        const int MAX_JOKERS_AND_ONE_EYED_JACKS = 2;
+
         PlayingCard[] hand = new PlayingCard[5];
         PlayingCard[] wildCards = new PlayingCard[4];
-        bool noWilds = false;
 
         public PokerHand(HandOfCards pokerHand, WildCardType wild = WildCardType.None)
         {
@@ -64,27 +65,13 @@ namespace CardGames.Games.Poker
 
         void EvaluateHand()
         {
-            /********************************************************
-             * Scoring Table
-             * ******************************************************
-             * No pair          = 0
-             * Pair             = 1
-             * 2 Pair           = 2
-             * 3 of a Kind      = 3
-             * Straight         = 4
-             * Flush            = 5
-             * Full House       = 6
-             * 4 of a Kind      = 7
-             * Straight Flush   = 8
-             * 5 of a Kind      = 9
-             *******************************************************/
-
             handScore = 0; // This value will be reset below, if there is no combination yielding points, it will not be changed.
 
             #region Duplicate Cards
             // Evaluate duplicate cards first
             for(int i = 0; i < hand.Length; i++)
             {
+                #region 5 of a kind and 4 of a kind
                 int currentHandScore = 0;
                 if (handScore == 9) break;
                 if (IsWild(hand[i])) continue;
@@ -99,8 +86,9 @@ namespace CardGames.Games.Poker
                     // 4 of a kind
                     currentHandScore = 7;
                 }
+                #endregion
 
-                #region 2 Pair and Full House
+                #region Pair, 2 Pair, 3 of a kind and Full House
                 else if (count == 3)
                 {
                     // Evaluate for a full house
@@ -167,10 +155,9 @@ namespace CardGames.Games.Poker
 
             #region Straights And Flushes
             // Evaluate Straight, Flush, and Straight Flush
-
             #region Straight Flush
             // Straight Flush
-            if (handScore == 0)
+            if (handScore < 8)
             {
                 if(IsFlush() && IsStraight())
                 {
@@ -192,7 +179,7 @@ namespace CardGames.Games.Poker
 
             #region Straight
             // Straight
-            if (handScore == 0)
+            if (handScore < 4)
             {
                 if(IsStraight())
                 {
@@ -201,17 +188,17 @@ namespace CardGames.Games.Poker
             }
             #endregion
             #endregion
-            Debug.Log($"HandScore: {handScore}");
         }
         
         bool IsFlush()
         {
-            // TODO: Make wild cards valid
             for (int i = 0; i < hand.Length; i++)
             {
+                if (IsWild(hand[i])) continue;
                 for (int j = 0; j < hand.Length; j++)
                 {
                     if (i == j) continue;
+                    if (IsWild(hand[j])) continue;
                     if (hand[i].GetSuit() != hand[j].GetSuit())
                     {
                         return false;
@@ -224,21 +211,24 @@ namespace CardGames.Games.Poker
         bool IsStraight()
         {
             // First sort the cards from highest to lowest
-            var descendingCards = from card in hand
-                                  orderby card.GetCardValue() descending
-                                  select card;
+            List<PlayingCard> sortedHand = GetSortedHand();
 
-            var sortedHand = descendingCards.ToArray();
+            // Find all wilds and place them at Top
+            PlaceWildsAtTopOfList(sortedHand);
 
+            // Correctly place wilds in straight
+            ReorderWildsInStraight(sortedHand);
+            return CheckIsStraight(sortedHand);
+        }
+
+        private bool CheckIsStraight(List<PlayingCard> sortedHand)
+        {
             // Compare the card values, check if it is the next lowest card value
-
-            // TODO: Make wild cards valid
-
             int comparator = (int)sortedHand[0].GetCardValue() - 1;
-            for(int i = 1; i < sortedHand.Length; i++)
+            for (int i = 1; i < sortedHand.Count; i++)
             {
                 int cardValue = (int)sortedHand[i].GetCardValue();
-                if(comparator == cardValue)
+                if (IsWild(sortedHand[i]) || comparator == cardValue)
                 {
                     comparator--;
                 }
@@ -248,6 +238,69 @@ namespace CardGames.Games.Poker
                 }
             }
             return true;
+        }
+
+        private void ReorderWildsInStraight(List<PlayingCard> sortedHand)
+        {
+            // Compare elements at i and j
+            for (int i = 0; i < sortedHand.Count; i++)
+            {
+                if (IsWild(sortedHand[i])) continue;
+                // Find all wilds and place them at Top
+                for (int j = 0; j < sortedHand.Count; j++)
+                {
+                    if (i == j) continue;
+                    if (IsWild(sortedHand[j])) continue;
+                    // Check if comparing sequential elements
+                    if (i == j - 1)
+                    {
+                        // Compare card values
+                        // Check if card values are sequential
+                        // The difference between elements at i and j should be 1
+                        if ((int)sortedHand[i].GetCardValue() - (int)sortedHand[j].GetCardValue() > 1)
+                        {
+                            // Find a wild card and place it a j in the sorted hand
+                            for (int k = 0; k < sortedHand.Count; k++)
+                            {
+                                if (k < j && IsWild(sortedHand[k]))
+                                {
+                                    // Remove the wildcard from the list
+                                    PlayingCard bufferCard = sortedHand[k];
+                                    sortedHand.RemoveAt(k);
+
+                                    // Place the wildcard at j-1
+                                    sortedHand.Insert(j - 1, bufferCard);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void PlaceWildsAtTopOfList(List<PlayingCard> sortedHand)
+        {
+            for (int i = 0; i < sortedHand.Count; i++)
+            {
+                if (IsWild(sortedHand[i]))
+                {
+                    // Remove card from list
+                    PlayingCard bufferCard = sortedHand[i];
+                    sortedHand.RemoveAt(i);
+
+                    // Place card at top
+                    sortedHand.Insert(0, bufferCard);
+                }
+            }
+        }
+
+        private List<PlayingCard> GetSortedHand()
+        {
+            var descendingCards = from card in hand
+                                  orderby card.GetCardValue() descending
+                                  select card;
+
+            return descendingCards.ToList();
         }
 
         int GetDuplicates(PlayingCard playingCard, bool useWilds)
@@ -323,29 +376,29 @@ namespace CardGames.Games.Poker
                 case WildCardType.Jokers:
                     GenerateJokers();
                     break;
+                default:
                 case WildCardType.None:
-                    noWilds = true;
                     break;
             }
         }
 
         private void GenerateJokers()
         {
-            wildCards = new PlayingCard[2];
+            wildCards = new PlayingCard[MAX_JOKERS_AND_ONE_EYED_JACKS];
             wildCards[0] = PlayingCard.CreateInstance(Suit.Diamonds, CardValue.Joker);
             wildCards[1] = PlayingCard.CreateInstance(Suit.Clubs, CardValue.Joker);
         }
 
         private void GenerateOneEyedJacks()
         {
-            wildCards = new PlayingCard[2];
+            wildCards = new PlayingCard[MAX_JOKERS_AND_ONE_EYED_JACKS];
             wildCards[0] = PlayingCard.CreateInstance(Suit.Spades, CardValue.Jack);
             wildCards[1] = PlayingCard.CreateInstance(Suit.Hearts, CardValue.Jack);
         }
 
         private void GenerateWildCards(CardValue value)
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < MAX_SUITS; i++)
             {
                 wildCards[i] = PlayingCard.CreateInstance((Suit)i, value);
             }
@@ -362,7 +415,6 @@ namespace CardGames.Games.Poker
                     for (int i = 0; i < wildCards.Length; i++)
                     {
                         wildCards[i] = PlayingCard.CreateInstance(wildCards[i].GetSuit(), wildCards[i].GetCardValue());
-                        Debug.Log($"WildCard: {wildCards[i].GetCardValue()} of {wildCards[i].GetSuit()}");
                         if (wildCards[i].GetSuit() == playingCard.GetSuit() && wildCards[i].GetCardValue() == playingCard.GetCardValue())
                         {
                             return true;
@@ -376,7 +428,6 @@ namespace CardGames.Games.Poker
                 Debug.LogWarning(e);
                 return false;
             }
-            
         }
 
         public int GetEvaluatedHand()

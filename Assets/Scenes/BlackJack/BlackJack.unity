@@ -1645,13 +1645,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hand:
-  - {fileID: 11400000, guid: 84bde8d3e546cfc4788a278311d75e6d, type: 2}
-  - {fileID: 11400000, guid: eaa2f20a798da1341a71ad5de569d175, type: 2}
-  - {fileID: 11400000, guid: 3f7f6dba51a69d444a71058da2617f6a, type: 2}
+  - {fileID: 11400000, guid: e4b17d84cc16d06419e4398ba45a9610, type: 2}
+  - {fileID: 11400000, guid: d621556cce642b74c8c02d1971f04caa, type: 2}
   - {fileID: 11400000, guid: 72553ddc3dd54d44ea4c37288664038b, type: 2}
-  - {fileID: 11400000, guid: a264fd4484231b240832778deebe599f, type: 2}
+  - {fileID: 11400000, guid: 47d4f42abccc3644eb5658bc25fc3408, type: 2}
+  - {fileID: 11400000, guid: 30be508b2ee8a6c4b9befb8d62f5bc3c, type: 2}
   sortedHand: []
-  wild: 0
+  wild: 1
   handOfCardsBase: {fileID: 1090761306585374695, guid: c2e10365b3e7ba64b87ac54964c757e6, type: 3}
 --- !u!4 &1100367231
 Transform:
