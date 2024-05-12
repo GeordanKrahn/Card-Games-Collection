@@ -7,6 +7,16 @@ namespace CardGames.Cards
     {
         List<PlayingCard> hand;
         public List<PlayingCard> Hand { get => hand; }
+
+        public void Initialize(List<PlayingCard> cards)
+        {
+            hand = new List<PlayingCard> ();
+            foreach(var card in cards)
+            {
+                AddCard(card);
+            }
+        }
+
         public void AddCard(PlayingCard card)
         {
             hand.Add(card);

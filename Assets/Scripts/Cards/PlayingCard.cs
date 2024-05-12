@@ -10,10 +10,18 @@ namespace CardGames.Cards
         [SerializeField] Sprite backSprite;
         [SerializeField] Sprite faceSprite;
 
-        public PlayingCard(Suit suit, CardValue value)
+        void Initialize(Suit suit, CardValue value)
         {
+            // PlayingCard card = (PlayingCard)CreateInstance("PlayingCard");
             this.suit = suit;
             this.value = value;
+        }
+
+        public static PlayingCard CreateInstance(Suit suit, CardValue value)
+        {
+            PlayingCard card = CreateInstance<PlayingCard>();
+            card.Initialize(suit, value);
+            return card;
         }
 
         public static bool operator ==(PlayingCard a, PlayingCard b)

@@ -15,8 +15,9 @@ namespace CardGames.Games.Poker
 
         PlayingCard[] hand = new PlayingCard[5];
         PlayingCard[] wildCards = new PlayingCard[4];
+        bool noWilds = false;
 
-        public PokerHand(HandOfCards pokerHand, WildCardType wild)
+        public PokerHand(HandOfCards pokerHand, WildCardType wild = WildCardType.None)
         {
             numberOfCards = pokerHand.Hand.Count;
             if(numberOfCards < 2 || numberOfCards > 5)
@@ -29,6 +30,7 @@ namespace CardGames.Games.Poker
                 {
                     hand[i] = pokerHand.Hand[i];
                 }
+                InitializeHand();
             }
             if(wild != WildCardType.None)
             {
@@ -36,6 +38,14 @@ namespace CardGames.Games.Poker
             }
             SetCardValues();
             EvaluateHand();
+        }
+
+        void InitializeHand()
+        {
+            for (int i = 0; i < hand.Length; i++)
+            {
+                hand[i] = PlayingCard.CreateInstance(hand[i].GetSuit(), hand[i].GetCardValue());
+            }
         }
 
         void SetCardValues()
@@ -73,63 +83,86 @@ namespace CardGames.Games.Poker
 
             #region Duplicate Cards
             // Evaluate duplicate cards first
-
-            // 5 of a kind
-            #region 5 of a kind
-
-            #endregion
-
-            #region 4 of a kind
-
-            // 4 of a kind
-            if (handScore == 0)
+            for(int i = 0; i < hand.Length; i++)
             {
-                // First find duplicate cards
-                // If no duplicates are found, look for a wild card
-                handScore = 7;
-            }
+                int currentHandScore = 0;
+                if (handScore == 9) break;
+                if (IsWild(hand[i])) continue;
+                int count = GetDuplicates(hand[i], true);
+                if(count == 5)
+                {
+                    // 5 of a kind
+                    currentHandScore = 9;
+                }
+                else if (count == 4)
+                {
+                    // 4 of a kind
+                    currentHandScore = 7;
+                }
 
-            #endregion
-
-            #region Full House
-            // Full House
-            if (handScore == 0)
-            {
-                // First find duplicate cards
-                // If no duplicates are found, look for a wild card
-                handScore = 6;
+                #region 2 Pair and Full House
+                else if (count == 3)
+                {
+                    // Evaluate for a full house
+                    for(int j = i + 1; j < hand.Length; j++)
+                    {
+                        // Dont evaluate the same card value
+                        if (hand[i].GetCardValue() == hand[j].GetCardValue()) continue;
+                        else
+                        {
+                            int secondCount = GetDuplicates(hand[j], false);
+                            if(secondCount == 2)
+                            {
+                                // full house
+                                currentHandScore = 6;
+                                break;
+                            }
+                            else
+                            {
+                                // 3 of a kind
+                                currentHandScore = 3;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (count == 2)
+                {
+                    // Evaluate for a full house of a 2 pair
+                    for (int j = i + 1; j < hand.Length; j++)
+                    {
+                        // Dont evaluate the same card value
+                        if (hand[i].GetCardValue() == hand[j].GetCardValue()) continue;
+                        else
+                        {
+                            int secondCount = GetDuplicates(hand[j], false);
+                            if (secondCount == 3)
+                            {
+                                // full house
+                                currentHandScore = 6;
+                                break;
+                            }
+                            else if (secondCount == 2)
+                            {
+                                // 2 pair
+                                currentHandScore = 2;
+                                break;
+                            }
+                            else
+                            {
+                                // pair
+                                currentHandScore = 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+                #endregion
+                if (currentHandScore >= handScore)
+                {
+                    handScore = currentHandScore;
+                }
             }
-            #endregion
-
-            #region 3 of a kind
-            // 3 of a kind
-            if (handScore == 0)
-            {
-                // First find duplicate cards
-                // If no duplicates are found, look for a wild card
-                handScore = 3;
-            }
-            #endregion
-
-            #region 2 Pair
-            // 2 pair
-            if (handScore == 0)
-            {
-                // First find duplicate cards
-                // If no duplicates are found, look for a wild card
-                handScore = 2;
-            }
-            #endregion
-
-            #region Pair
-            // Pair
-            if (handScore == 0)
-            {
-                // First find duplicate cards
-                // If no duplicates are found, look for a wild card
-                handScore = 1;
-            }
-            #endregion
             #endregion
 
             #region Straights And Flushes
@@ -168,23 +201,21 @@ namespace CardGames.Games.Poker
             }
             #endregion
             #endregion
+            Debug.Log($"HandScore: {handScore}");
         }
         
         bool IsFlush()
         {
-            Suit cardSuit = Suit.NONE;
-            foreach(var card in hand)
-            {
-                if (IsWild(card)) continue;
-                cardSuit = card.GetSuit();
-                break;
-            }
+            // TODO: Make wild cards valid
             for (int i = 0; i < hand.Length; i++)
             {
-                if (IsWild(hand[i])) continue;
-                if (hand[i].GetSuit() != cardSuit)
+                for (int j = 0; j < hand.Length; j++)
                 {
-                    return false;
+                    if (i == j) continue;
+                    if (hand[i].GetSuit() != hand[j].GetSuit())
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
@@ -200,10 +231,14 @@ namespace CardGames.Games.Poker
             var sortedHand = descendingCards.ToArray();
 
             // Compare the card values, check if it is the next lowest card value
-            int comparator = (int)sortedHand[0].GetCardValue();
+
+            // TODO: Make wild cards valid
+
+            int comparator = (int)sortedHand[0].GetCardValue() - 1;
             for(int i = 1; i < sortedHand.Length; i++)
             {
-                if(comparator == (int)sortedHand[i].GetCardValue() - 1)
+                int cardValue = (int)sortedHand[i].GetCardValue();
+                if(comparator == cardValue)
                 {
                     comparator--;
                 }
@@ -215,10 +250,28 @@ namespace CardGames.Games.Poker
             return true;
         }
 
-        int GetDuplicates(PlayingCard playingCard)
+        int GetDuplicates(PlayingCard playingCard, bool useWilds)
         {
-            // TODO
-            return 0;
+            int count = 1; // Start count at one, if no duplicates, we only have single cards
+            foreach(var card in hand)
+            {
+                if (card == playingCard) continue;
+                if(useWilds)
+                {
+                    if (IsWild(card) || card.GetCardValue() == playingCard.GetCardValue())
+                    {
+                        count++;
+                    }
+                }
+                else
+                {
+                    if (card.GetCardValue() == playingCard.GetCardValue())
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
         }
 
         void SetWildCards(WildCardType type)
@@ -270,7 +323,8 @@ namespace CardGames.Games.Poker
                 case WildCardType.Jokers:
                     GenerateJokers();
                     break;
-                default:
+                case WildCardType.None:
+                    noWilds = true;
                     break;
             }
         }
@@ -278,39 +332,51 @@ namespace CardGames.Games.Poker
         private void GenerateJokers()
         {
             wildCards = new PlayingCard[2];
-            wildCards[0] = new PlayingCard(Suit.Diamonds, CardValue.Joker);
-            wildCards[1] = new PlayingCard(Suit.Clubs, CardValue.Joker);
+            wildCards[0] = PlayingCard.CreateInstance(Suit.Diamonds, CardValue.Joker);
+            wildCards[1] = PlayingCard.CreateInstance(Suit.Clubs, CardValue.Joker);
         }
 
         private void GenerateOneEyedJacks()
         {
             wildCards = new PlayingCard[2];
-            wildCards[0] = new PlayingCard(Suit.Spades, CardValue.Jack);
-            wildCards[1] = new PlayingCard(Suit.Hearts, CardValue.Jack);
+            wildCards[0] = PlayingCard.CreateInstance(Suit.Spades, CardValue.Jack);
+            wildCards[1] = PlayingCard.CreateInstance(Suit.Hearts, CardValue.Jack);
         }
 
         private void GenerateWildCards(CardValue value)
         {
             for (int i = 0; i < 4; i++)
             {
-                wildCards[i] = new PlayingCard((Suit)i, value);
+                wildCards[i] = PlayingCard.CreateInstance((Suit)i, value);
             }
         }
 
         bool IsWild(PlayingCard playingCard)
         {
-            if (wildCards.Length == 0) return false;
-            else
+            try
             {
-                foreach(var card in wildCards)
+                playingCard = PlayingCard.CreateInstance(playingCard.GetSuit(), playingCard.GetCardValue());
+                if (wildCards.Length == 0) return false;
+                else
                 {
-                    if(card == playingCard)
+                    for (int i = 0; i < wildCards.Length; i++)
                     {
-                        return true;
+                        wildCards[i] = PlayingCard.CreateInstance(wildCards[i].GetSuit(), wildCards[i].GetCardValue());
+                        Debug.Log($"WildCard: {wildCards[i].GetCardValue()} of {wildCards[i].GetSuit()}");
+                        if (wildCards[i].GetSuit() == playingCard.GetSuit() && wildCards[i].GetCardValue() == playingCard.GetCardValue())
+                        {
+                            return true;
+                        }
                     }
+                    return false;
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
                 return false;
             }
+            
         }
 
         public int GetEvaluatedHand()
