@@ -1631,7 +1631,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1100367230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1651,7 +1651,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 47d4f42abccc3644eb5658bc25fc3408, type: 2}
   - {fileID: 11400000, guid: 30be508b2ee8a6c4b9befb8d62f5bc3c, type: 2}
   sortedHand: []
-  wild: 1
+  wild: 0
   handOfCardsBase: {fileID: 1090761306585374695, guid: c2e10365b3e7ba64b87ac54964c757e6, type: 3}
 --- !u!4 &1100367231
 Transform:
@@ -2110,6 +2110,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1248190240}
   m_CullTransparentMesh: 1
+--- !u!1 &1276232770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1276232772}
+  - component: {fileID: 1276232771}
+  m_Layer: 0
+  m_Name: BlackJackHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1276232771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1276232770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb09132111ef30a4ba3c6b1144fbe892, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hand:
+  - {fileID: 11400000, guid: d07ab4e2cfabbb74cab5b9aa7b5ca9fa, type: 2}
+  - {fileID: 11400000, guid: c2d09a10f6c009f4ab25173ec9171027, type: 2}
+  - {fileID: 11400000, guid: aaf4d484b5ef66a49aee7d693e9bc894, type: 2}
+  handOfCardsBase: {fileID: 1090761306585374695, guid: c2e10365b3e7ba64b87ac54964c757e6, type: 3}
+--- !u!4 &1276232772
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1276232770}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.3469499, y: -7.8134327, z: -4.3246193}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1330361782
 GameObject:
   m_ObjectHideFlags: 0

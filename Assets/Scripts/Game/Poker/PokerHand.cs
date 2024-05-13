@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CardGames.Games.Poker
 {
-    public class PokerHand
+    public class PokerHand : Hand
     {
         int numberOfCards;
         int handScore;
@@ -15,11 +15,11 @@ namespace CardGames.Games.Poker
         const int MAX_SUITS = 4;
         const int MAX_JOKERS_AND_ONE_EYED_JACKS = 2;
 
-        PlayingCard[] hand = new PlayingCard[5];
         PlayingCard[] wildCards = new PlayingCard[4];
 
         public PokerHand(HandOfCards pokerHand, WildCardType wild = WildCardType.None)
         {
+            hand = new PlayingCard[5];
             numberOfCards = pokerHand.Hand.Count;
             if(numberOfCards < 2 || numberOfCards > 5)
             {
@@ -41,14 +41,6 @@ namespace CardGames.Games.Poker
             EvaluateHand();
         }
 
-        void InitializeHand()
-        {
-            for (int i = 0; i < hand.Length; i++)
-            {
-                hand[i] = PlayingCard.CreateInstance(hand[i].GetSuit(), hand[i].GetCardValue());
-            }
-        }
-
         void SetCardValues()
         {
             var descendingCards = from card in hand
@@ -63,7 +55,7 @@ namespace CardGames.Games.Poker
             }
         }
 
-        void EvaluateHand()
+        internal override void EvaluateHand()
         {
             handScore = 0; // This value will be reset below, if there is no combination yielding points, it will not be changed.
 
@@ -430,7 +422,7 @@ namespace CardGames.Games.Poker
             }
         }
 
-        public int GetEvaluatedHand()
+        public override int GetEvaluatedHand()
         {
             return handScore;
         }
