@@ -8,7 +8,6 @@ namespace CardGames.Games.BlackJack
 {
     public class BlackJackHand : Hand
     {
-        int points;
         const int BLACK_JACK = 21;
         const int ACES_LOW = 10;
         public BlackJackHand(HandOfCards blackJackHand)
@@ -28,11 +27,6 @@ namespace CardGames.Games.BlackJack
                 InitializeHand();
             }
             EvaluateHand();
-        }
-
-        public override int GetEvaluatedHand()
-        {
-            return points;
         }
 
         public bool IsBlackJack()

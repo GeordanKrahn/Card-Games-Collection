@@ -488,6 +488,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   discardPile: []
   cardBase: {fileID: 3047408101165352284, guid: 4fddd6b6e54dd05499391c6bca9f7bec, type: 3}
+--- !u!1 &398711989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 398711991}
+  - component: {fileID: 398711990}
+  m_Layer: 0
+  m_Name: CribbageHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &398711990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398711989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f97c5218ce80a04da4e9c1c1d8c9f6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hand:
+  - {fileID: 11400000, guid: b48c2cb8c2698114ca95c9a980b99803, type: 2}
+  - {fileID: 11400000, guid: f76ded448218bee48959718132f44dbc, type: 2}
+  - {fileID: 11400000, guid: 42cc51f745fd29943863262a424a503e, type: 2}
+  - {fileID: 11400000, guid: b8ee24df8feb04f41a89c7adea0f2ee7, type: 2}
+  cutCard: {fileID: 11400000, guid: 0c7f7e04c52bb104b87e4ba8511ac3d0, type: 2}
+  handOfCardsBase: {fileID: 1090761306585374695, guid: c2e10365b3e7ba64b87ac54964c757e6, type: 3}
+--- !u!4 &398711991
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398711989}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.3469499, y: -7.8134327, z: -4.3246193}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &432262085
 GameObject:
   m_ObjectHideFlags: 0
@@ -2126,7 +2177,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1276232771
 MonoBehaviour:
   m_ObjectHideFlags: 0

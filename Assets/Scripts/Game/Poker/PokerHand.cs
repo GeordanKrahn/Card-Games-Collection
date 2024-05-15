@@ -9,7 +9,6 @@ namespace CardGames.Games.Poker
     public class PokerHand : Hand
     {
         int numberOfCards;
-        int handScore;
         int[] cardValues;
 
         const int MAX_SUITS = 4;
@@ -57,26 +56,26 @@ namespace CardGames.Games.Poker
 
         internal override void EvaluateHand()
         {
-            handScore = 0; // This value will be reset below, if there is no combination yielding points, it will not be changed.
+            points = 0; // This value will be reset below, if there is no combination yielding points, it will not be changed.
 
             #region Duplicate Cards
             // Evaluate duplicate cards first
             for(int i = 0; i < hand.Length; i++)
             {
                 #region 5 of a kind and 4 of a kind
-                int currentHandScore = 0;
-                if (handScore == 9) break;
+                int currentPoints = 0;
+                if (points == 9) break;
                 if (IsWild(hand[i])) continue;
                 int count = GetDuplicates(hand[i], true);
                 if(count == 5)
                 {
                     // 5 of a kind
-                    currentHandScore = 9;
+                    currentPoints = 9;
                 }
                 else if (count == 4)
                 {
                     // 4 of a kind
-                    currentHandScore = 7;
+                    currentPoints = 7;
                 }
                 #endregion
 
@@ -94,13 +93,13 @@ namespace CardGames.Games.Poker
                             if(secondCount == 2)
                             {
                                 // full house
-                                currentHandScore = 6;
+                                currentPoints = 6;
                                 break;
                             }
                             else
                             {
                                 // 3 of a kind
-                                currentHandScore = 3;
+                                currentPoints = 3;
                                 break;
                             }
                         }
@@ -119,28 +118,28 @@ namespace CardGames.Games.Poker
                             if (secondCount == 3)
                             {
                                 // full house
-                                currentHandScore = 6;
+                                currentPoints = 6;
                                 break;
                             }
                             else if (secondCount == 2)
                             {
                                 // 2 pair
-                                currentHandScore = 2;
+                                currentPoints = 2;
                                 break;
                             }
                             else
                             {
                                 // pair
-                                currentHandScore = 1;
+                                currentPoints = 1;
                                 break;
                             }
                         }
                     }
                 }
                 #endregion
-                if (currentHandScore >= handScore)
+                if (currentPoints >= points)
                 {
-                    handScore = currentHandScore;
+                    points = currentPoints;
                 }
             }
             #endregion
@@ -149,33 +148,33 @@ namespace CardGames.Games.Poker
             // Evaluate Straight, Flush, and Straight Flush
             #region Straight Flush
             // Straight Flush
-            if (handScore < 8)
+            if (points < 8)
             {
                 if(IsFlush() && IsStraight())
                 {
-                    handScore = 8;
+                    points = 8;
                 }
             }
             #endregion
 
             #region Flush
             // Flush
-            if (handScore == 0)
+            if (points == 0)
             {
                 if(IsFlush())
                 {
-                    handScore = 5;
+                    points = 5;
                 }
             }
             #endregion
 
             #region Straight
             // Straight
-            if (handScore < 4)
+            if (points < 4)
             {
                 if(IsStraight())
                 {
-                    handScore = 4;
+                    points = 4;
                 }
             }
             #endregion
@@ -420,11 +419,6 @@ namespace CardGames.Games.Poker
                 Debug.LogWarning(e);
                 return false;
             }
-        }
-
-        public override int GetEvaluatedHand()
-        {
-            return handScore;
         }
 
         public int[] GetCardValues()

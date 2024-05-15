@@ -7,9 +7,11 @@ namespace CardGames.Games
 {
     public abstract class Hand
     {
+        internal int points;
         [SerializeField] internal HandOfCards handOfCardsBase;
         internal PlayingCard[] hand;
-        internal void InitializeHand()
+
+        internal virtual void InitializeHand()
         {
             for (int i = 0; i < hand.Length; i++)
             {
@@ -18,6 +20,9 @@ namespace CardGames.Games
         }
 
         internal abstract void EvaluateHand();
-        public abstract int GetEvaluatedHand();
+        public virtual int GetEvaluatedHand()
+        {
+            return points;
+        }
     }
 }
