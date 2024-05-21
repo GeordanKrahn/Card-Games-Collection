@@ -48,6 +48,21 @@ namespace CardGames.Cards
             }
         }
 
+        public override bool Equals(object other)
+        {
+            return this == (PlayingCard)other;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{GetCardValue()} of {GetSuit()}";
+        }
+
         public Suit GetSuit() => suit;
         public CardValue GetCardValue() => value;
         public Sprite GetBackSprite() => backSprite;
